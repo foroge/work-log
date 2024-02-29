@@ -20,7 +20,10 @@ def index():
         if work.is_finished:
             is_finished = "Is finished"
         work_size = f"{work.work_size} hours"
-        list_works.append([work.id, work.job, team_leader, work_size, work.collaborators, is_finished])
+        collaborators = "No members"
+        if work.collaborators:
+            collaborators = work.collaborators
+        list_works.append([work.id, work.job, team_leader, work_size, collaborators, is_finished])
     return render_template("index.html", works=list_works)
 
 
