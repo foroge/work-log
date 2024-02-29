@@ -16,7 +16,11 @@ def index():
     for work in works:
         team_leader = db_sess.query(User).filter(User.id == work.team_leader).first()
         team_leader = f"{team_leader.name} {team_leader.surname}"
-        list_works.append([work.id, work.job, team_leader, work.work_size, work.collaborators, work.is_finished])
+        is_finished = "Is not finished"
+        if work.is_finished:
+            is_finished = "Is finished"
+        work_size = f"{work.work_size} hours"
+        list_works.append([work.id, work.job, team_leader, work_size, work.collaborators, is_finished])
     return render_template("index.html", works=list_works)
 
 
