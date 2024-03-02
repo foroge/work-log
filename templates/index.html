@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 xmlns="http://www.w3.org/1999/html">Works log</h1>
+{% for item in works%}
+<div class="col-md6 border rounded">
+    <h1>Action # {{ item[0] }}</h1>
+    <table>
+        <tr>
+            <th>Title of activity</th>
+            <th>Team leader</th>
+            <th>Duration</th>
+            <th>List of collaborators</th>
+            <th>Is finished</th>
+        </tr>
+        <tr>
+            <th>{{ item[1] }}</th>
+            <th>{{ item[2] }}</th>
+            <th>{{ item[3] }}</th>
+            <th>{{ item[4] }}</th>
+            <th>{{ item[5] }}</th>
+        </tr>
+    </table>
+</div>
+{% endfor %}
+{% endblock %}
