@@ -1,12 +1,66 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from data.users import User
-from forms.user import RegisterForm
+from forms.user import RegisterForm, LoginForm
+from forms.job import JobsForm
 from data.jobs import Jobs
 from data.department import Departments
 from data import db_session
+from flask_login import LoginManager, login_user, login_required, logout_user
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(user_id)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
+@app.route('/add_job', methods=['GET', 'POST'])
+def add_job():
+    form = JobsForm()
+    if form.validate_on_submit():
+        job = Jobs(
+            team_leader=form.team_leader.data,
+            job=form.job.data,
+            work_size=form.work_size.data,
+            collaborators=form.collaborators.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            is_finished=form.is_finished.data,
+        )
+        db_sess = db_session.create_session()
+        db_sess.add(job)
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/')
+    return render_template('add_job.html', title='Add job', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('login.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route("/")
@@ -26,11 +80,6 @@ def index():
             collaborators = work.collaborators
         list_works.append([work.id, work.job, team_leader, work_size, collaborators, is_finished])
     return render_template("index.html", works=list_works)
-
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -69,49 +118,13 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
+        db_sess.close()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
 
 def main():
     db_session.global_init("db/blogs.db")
-    db_sess = db_session.create_session()
-    # job = Jobs()
-    # job.team_leader = 2
-    # job.job = "gdfjgjdslgs;lj"
-    # cap = User()
-    # cap.surname = "Scott"
-    # cap.name = "Ridley"
-    # cap.age = 21
-    # cap.position = "captain"
-    # cap.speciality = "research engineer"
-    # cap.address = "module_1"
-    # cap.email = "scott_chief@mars.org"
-    #
-    # db_sess.add(cap)
-    # db_sess.commit()
-    #
-    # for i in range(4):
-    #     user = User()
-    #     user.surname = "Alex"
-    #     user.name = f"Forward_{i}"
-    #     user.age = 24
-    #     user.position = "Privat"
-    #     user.speciality = "research engineer"
-    #     user.address = f"module_{i}"
-    #     user.email = f"basic_{i}@mars.org"
-    #     user.hashed_password = f"basic_{i}"
-    #
-    #     db_sess.add(user)
-    #     db_sess.commit()
-    #
-    # dep = Departments()
-    # dep.title = "research engineer"
-    # dep.members = [user]
-    #
-    # db_sess.add(job)
-    # db_sess.commit()
-    # db_sess.close()
     app.run(port=8080, host='127.0.0.1')
 
 
