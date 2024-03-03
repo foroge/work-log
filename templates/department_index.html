@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 xmlns="http://www.w3.org/1999/html">List of departments</h1>
+{% if current_user.is_authenticated %}
+<button>
+    <a href="/" class="btn btn-secondary">Back to Jobs</a>
+</button>
+<button>
+    <a href="/add_department" class="btn btn-secondary">Добавить департамент</a>
+</button>
+{% endif %}
+{% for item in deps%}
+<div class="col-md6 border rounded">
+    <h1>Department # {{ item[0] }}</h1>
+    <table align="center">
+        <tr>
+            <th>Title of department</th>
+            <th>Chief</th>
+            <th>Members</th>
+            <th>Department email</th>
+        </tr>
+        <tr>
+            <th>{{ item[1] }}</th>
+            <th>{{ item[2] }}</th>
+            <th>{{ item[3] }}</th>
+            <th>{{ item[4] }}</th>
+        </tr>
+    </table>
+</div>
+{% if current_user.is_authenticated and (current_user.id == item[-1] or current_user.id == 1): %}
+    <div>
+        <button>
+            <a href="/department_edit/{{ item[0] }}" class="btn btn-warning">Изменить</a>
+        </button>
+        <button>
+            <a href="/department_delete/{{ item[0] }}" class="btn btn-danger">Удалить</a>
+        </button>
+    </div>
+{% endif %}
+{% endfor %}
+{% endblock %}

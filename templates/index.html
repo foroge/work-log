@@ -4,6 +4,9 @@
 <h1 xmlns="http://www.w3.org/1999/html">Works log</h1>
 {% if current_user.is_authenticated %}
 <button>
+    <a href="/department" class="btn btn-secondary">Go to departments</a>
+</button>
+<button>
     <a href="/add_job" class="btn btn-secondary">Добавить новость</a>
 </button>
 {% endif %}

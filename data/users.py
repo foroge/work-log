@@ -20,8 +20,8 @@ class User(SqlAlchemyBase, UserMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime)
 
-    dep_id = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey("departments.id"))
-    departments = orm.relationship('Departments', back_populates="members")
+    dep_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("department.id"))
+    department = orm.relationship('Department', back_populates="members")
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

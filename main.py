@@ -2,8 +2,9 @@ from flask import Flask, render_template, redirect, request
 from data.users import User
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm
+from forms.department import DepartmentForm
 from data.jobs import Jobs
-from data.department import Departments
+from data.department import Department
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
@@ -25,6 +26,104 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/department_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def department_delete(id):
+    db_sess = db_session.create_session()
+    deps = db_sess.query(Department).filter(Department.id == id).filter(
+        (Department.chief == current_user.id | current_user.id == 1)).first()
+    if deps:
+        for user in dep.members:
+            user.dep_id = None
+            db_sess.commit()
+        db_sess.delete(deps)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/department')
+
+
+@app.route('/department_edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def department_edit(id):
+    form = DepartmentForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        deps = db_sess.query(Department).filter(Department.id == id).filter(
+            (Department.chief == current_user.id | current_user.id == 1)).first()
+        if deps:
+            members = ", ".join([str(user.id) for user in deps.members])
+            form.members.data = members
+            form.title.data = deps.title
+            form.chief.data = deps.chief
+            form.email.data = deps.email
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        deps = db_sess.query(Department).filter(Department.id == id).filter(
+            (Department.chief == current_user.id | current_user.id == 1)).first()
+        if deps:
+            members = form.members.data.split(", ")
+            for i in members:
+                try:
+                    user = db_sess.query(User).filter(User.id == i).first()
+                    if user.dep_id != deps.id:
+                        user.dep_id = deps.id
+                        db_sess.commit()
+                except Exception:
+                    pass
+            deps.title = form.title.data
+            deps.chief = form.chief.data
+            deps.email = form.email.data
+            db_sess.commit()
+            return redirect('/department')
+        else:
+            abort(404)
+    return render_template('department.html', title='Редактирование новости', form=form)
+
+
+@app.route('/add_department', methods=['GET', 'POST'])
+def add_department():
+    form = DepartmentForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+
+        dep = Department(
+            title=form.title.data,
+            chief=form.chief.data,
+            email=form.email.data
+        )
+        db_sess.add(dep)
+        db_sess.commit()
+        dep = db_sess.query(Department).filter(Department.email == form.email.data).first()
+        members = form.members.data.split(", ")
+        for i in members:
+            try:
+                user = db_sess.query(User).filter(User.id == i).first()
+                if user.dep_id != dep.id:
+                    user.dep_id = dep.id
+                    db_sess.commit()
+            except Exception:
+                pass
+        db_sess.close()
+        return redirect('/department')
+    return render_template('department.html', title='Add department', form=form)
+
+
+@app.route("/department")
+def index_dep():
+    db_sess = db_session.create_session()
+    deps = db_sess.query(Department).all()
+    list_deps = list()
+    for dep in deps:
+        members = ", ".join([str(user.id) for user in dep.members]) if dep.members else "No members"
+        chief = db_sess.query(User).filter(User.id == dep.chief).first()
+        chief = f"{chief.name} {chief.surname}"
+        list_deps.append([dep.id, dep.title, chief, members, dep.email, dep.chief])
+    return render_template("department_index.html", deps=list_deps)
 
 
 @app.route('/jobs_delete/<int:id>', methods=['GET', 'POST'])
@@ -164,7 +263,8 @@ def reqister():
             age=form.age.data,
             position=form.position.data,
             speciality=form.speciality.data,
-            address=form.address.data
+            address=form.address.data,
+            dep_id=form.dep_id.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)

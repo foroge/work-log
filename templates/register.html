@@ -80,7 +80,6 @@
             </p>
         {% endfor %}
     </p>
-
     <p>
         {{ form.address.label }}<br>
         {{ form.address(class="form-control") }}
@@ -90,7 +89,15 @@
             </p>
         {% endfor %}
     </p>
-
+    <p>
+        {{ form.dep_id.label }}<br>
+        {{ form.dep_id(class="form-control") }}
+        {% for error in form.dep_id.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     {{message}}
 </form>

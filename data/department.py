@@ -4,15 +4,15 @@ from data.db_session import SqlAlchemyBase
 from sqlalchemy import orm
 
 
-class Departments(SqlAlchemyBase):
-    __tablename__ = 'departments'
+class Department(SqlAlchemyBase):
+    __tablename__ = 'department'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-
+    title = sqlalchemy.Column(sqlalchemy.String)
     chief = sqlalchemy.Column(sqlalchemy.Integer)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
 
-    members = orm.relationship('User', back_populates="departments")
+    members = orm.relationship('User', back_populates="department")
 
 
 
