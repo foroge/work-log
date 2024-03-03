@@ -129,7 +129,7 @@ def index():
         collaborators = "No members"
         if work.collaborators:
             collaborators = work.collaborators
-        list_works.append([work.id, work.job, team_leader, work_size, collaborators, is_finished])
+        list_works.append([work.id, work.job, team_leader, work_size, collaborators, is_finished, work.team_leader])
     return render_template("index.html", works=list_works)
 
 

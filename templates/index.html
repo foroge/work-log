@@ -2,10 +2,15 @@
 
 {% block content %}
 <h1 xmlns="http://www.w3.org/1999/html">Works log</h1>
+{% if current_user.is_authenticated %}
+<button>
+    <a href="/add_job" class="btn btn-secondary">Добавить новость</a>
+</button>
+{% endif %}
 {% for item in works%}
 <div class="col-md6 border rounded">
     <h1>Action # {{ item[0] }}</h1>
-    <table>
+    <table align="center">
         <tr>
             <th>Title of activity</th>
             <th>Team leader</th>
@@ -22,5 +27,15 @@
         </tr>
     </table>
 </div>
+{% if current_user.is_authenticated and (current_user.id == item[-1] or current_user.id == 1): %}
+    <div>
+        <button>
+            <a href="/edit_job/{{ item[0] }}" class="btn btn-warning">Изменить</a>
+        </button>
+        <button>
+            <a href="/jobs_delete/{{ item[0] }}" class="btn btn-danger">Удалить</a>
+        </button>
+    </div>
+{% endif %}
 {% endfor %}
 {% endblock %}

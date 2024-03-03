@@ -8,7 +8,7 @@
     <nav>
         {% if current_user.is_authenticated %}
         <a class="navbar-brand" href="/logout">{{ current_user.surname }} {{ current_user.name }}</a>
-        <a class="btn btn-success" href="/add_job">Добавить работу</a>
+<!--        <a class="btn btn-success" href="/add_job">Добавить работу</a>-->
         {% else %}
     <p>
         <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
@@ -21,7 +21,10 @@
         <h1>Миссия Колонизация Марса</h1>
         <h3>И на Марсе будут яблони цвести!</h3>
         <main role="main" class="container">
-            {% block content %}{% endblock %}
+            <div align="center">
+                {% block content %}{% endblock %}
+            </div>
+
         </main>
     </body>
 </html>
