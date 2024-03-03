@@ -2,8 +2,10 @@ from flask import Flask, render_template, redirect, request
 from data.users import User
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm
+from forms.category import CategoryForm
 from forms.department import DepartmentForm
 from data.jobs import Jobs
+from data.category import Category
 from data.department import Department
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -26,6 +28,64 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/category_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def category_delete(id):
+    db_sess = db_session.create_session()
+    cat = db_sess.query(Category).filter(Category.id == id).first()
+    if cat:
+        db_sess.delete(cat)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/category')
+
+
+@app.route('/category_edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def category_edit(id):
+    form = CategoryForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        cat = db_sess.query(Category).filter(CategoryForm.id == id).first()
+        if cat:
+            form.name.data = cat.name
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        cat = db_sess.query(Category).filter(CategoryForm.id == id).first()
+        if cat:
+            cat.name = form.name.data
+            db_sess.commit()
+            return redirect('/category')
+        else:
+            abort(404)
+    return render_template('category_form.html', title='Редактирование категории', form=form)
+
+
+@app.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    form = CategoryForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        cat = Category(
+            name=form.name.data,
+        )
+        db_sess.add(cat)
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/category')
+    return render_template('category_form.html', title='Добавить категорию', form=form)
+
+
+@app.route("/category")
+def index_category():
+    db_sess = db_session.create_session()
+    cats = db_sess.query(Category).all()
+    return render_template("category.html", cats=cats)
 
 
 @app.route('/department_delete/<int:id>', methods=['GET', 'POST'])
@@ -110,7 +170,7 @@ def add_department():
                 pass
         db_sess.close()
         return redirect('/department')
-    return render_template('department.html', title='Add department', form=form)
+    return render_template('department.html', title='Добавить департамент', form=form)
 
 
 @app.route("/department")
@@ -149,6 +209,7 @@ def edit_jobs(id):
         jobs = db_sess.query(Jobs).filter(Jobs.id == id).filter(
             (Jobs.team_leader == current_user.id | current_user.id == 1)).first()
         if jobs:
+            form.category.data = ", ".join([str(i.id) for i in jobs.category])
             form.team_leader.data = jobs.team_leader
             form.job.data = jobs.job
             form.work_size.data = jobs.work_size
@@ -163,6 +224,9 @@ def edit_jobs(id):
         jobs = db_sess.query(Jobs).filter(Jobs.id == id).filter(
                                           (Jobs.team_leader == current_user.id | current_user.id == 1)).first()
         if jobs:
+            jobs.categories = None
+            for i in form.categories.data.split(", "):
+                jobs.category.append(db_sess.query(Category).filter(Category.id == i))
             jobs.team_leader = form.team_leader.data
             jobs.job = form.job.data
             jobs.work_size = form.work_size.data
@@ -174,7 +238,7 @@ def edit_jobs(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('job.html', title='Редактирование новости', form=form)
+    return render_template('job.html', title='Редактирование работы', form=form)
 
 
 @app.route('/add_job', methods=['GET', 'POST'])
@@ -191,11 +255,13 @@ def add_job():
             is_finished=form.is_finished.data,
         )
         db_sess = db_session.create_session()
+        for i in form.category.data.split(", "):
+            job.category.append(db_sess.query(Category).filter(Category.id == i).first())
         db_sess.add(job)
         db_sess.commit()
         db_sess.close()
         return redirect('/')
-    return render_template('job.html', title='Add job', form=form)
+    return render_template('job.html', title='Добавить работу', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -226,9 +292,10 @@ def index():
             is_finished = "Is finished"
         work_size = f"{work.work_size} hours"
         collaborators = "No members"
+        category = ", ".join([str(i.id) for i in work.category])
         if work.collaborators:
             collaborators = work.collaborators
-        list_works.append([work.id, work.job, team_leader, work_size, collaborators, is_finished, work.team_leader])
+        list_works.append([work.id, work.job, team_leader, work_size, collaborators, category, is_finished, work.team_leader])
     return render_template("index.html", works=list_works)
 
 

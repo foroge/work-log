@@ -11,5 +11,6 @@ class JobsForm(FlaskForm):
     start_date = DateField('Start date')
     end_date = DateField('End date')
     is_finished = BooleanField("Is finished", validators=[DataRequired()])
+    category = StringField('Category')
     submit = SubmitField('Добавить')
 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 xmlns="http://www.w3.org/1999/html">List of departments</h1>
+{% if current_user.is_authenticated %}
+<button>
+    <a href="/" class="btn btn-secondary">Работа</a>
+</button>
+<button>
+    <a href="/department" class="btn btn-secondary">Департаменты</a>
+</button>
+<button>
+    <a href="/add_category" class="btn btn-secondary">Добавить категорию</a>
+</button>
+{% endif %}
+
+<div class="col-md6 border rounded">
+    {% for item in cats%}
+    <table align="center">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+        </tr>
+        <tr>
+            <th>{{ item.id }}</th>
+            <th>{{ item.name }}</th>
+        </tr>
+    </table>
+</div>
+{% if current_user.is_authenticated %}
+    <div>
+        <button>
+            <a href="/category_edit/{{ item.id }}" class="btn btn-warning">Изменить</a>
+        </button>
+        <button>
+            <a href="/category_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+        </button>
+    </div>
+{% endif %}
+{% endfor %}
+{% endblock %}

@@ -4,7 +4,10 @@
 <h1 xmlns="http://www.w3.org/1999/html">List of departments</h1>
 {% if current_user.is_authenticated %}
 <button>
-    <a href="/" class="btn btn-secondary">Back to Jobs</a>
+    <a href="/" class="btn btn-secondary">Работа</a>
+</button>
+<button>
+    <a href="/category" class="btn btn-secondary">Категории</a>
 </button>
 <button>
     <a href="/add_department" class="btn btn-secondary">Добавить департамент</a>

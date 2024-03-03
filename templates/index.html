@@ -4,10 +4,13 @@
 <h1 xmlns="http://www.w3.org/1999/html">Works log</h1>
 {% if current_user.is_authenticated %}
 <button>
-    <a href="/department" class="btn btn-secondary">Go to departments</a>
+    <a href="/department" class="btn btn-secondary">Департаменты</a>
 </button>
 <button>
-    <a href="/add_job" class="btn btn-secondary">Добавить новость</a>
+    <a href="/category" class="btn btn-secondary">Категории</a>
+</button>
+<button>
+    <a href="/add_job" class="btn btn-secondary">Добавить работу</a>
 </button>
 {% endif %}
 {% for item in works%}
@@ -19,6 +22,7 @@
             <th>Team leader</th>
             <th>Duration</th>
             <th>List of collaborators</th>
+            <th>Hazard category</th>
             <th>Is finished</th>
         </tr>
         <tr>
@@ -27,6 +31,7 @@
             <th>{{ item[3] }}</th>
             <th>{{ item[4] }}</th>
             <th>{{ item[5] }}</th>
+            <th>{{ item[6] }}</th>
         </tr>
     </table>
 </div>
