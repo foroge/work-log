@@ -1,18 +1,31 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, make_response
 from data.users import User
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm
 from forms.department import DepartmentForm
 from data.jobs import Jobs
 from data.department import Department
-from data import db_session
+from data import db_session, jobs_api, jobs_resources, users_resources
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_restful import reqparse, abort, Api, Resource
+
 
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
 @login_manager.user_loader
@@ -276,6 +289,19 @@ def reqister():
 
 def main():
     db_session.global_init("db/blogs.db")
+    app.register_blueprint(jobs_api.blueprint)
+    # для списка объектов
+    api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
+
+    # для одного объекта
+    api.add_resource(jobs_resources.JobsResource, '/api/v2/jobs/<int:jobs_id>')
+
+    # для списка объектов
+    api.add_resource(users_resources.UserListResource, '/api/v2/users')
+
+    # для одного объекта
+    api.add_resource(users_resources.UserListResource, '/api/v2/users/<int:users_id>')
+
     app.run(port=8080, host='127.0.0.1')
 
 
