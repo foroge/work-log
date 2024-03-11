@@ -5,7 +5,7 @@ from forms.job import JobsForm
 from forms.department import DepartmentForm
 from data.jobs import Jobs
 from data.department import Department
-from data import db_session, jobs_api, jobs_resources, users_resources
+from data import db_session, jobs_api, jobs_resources, users_resources, users_api
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import reqparse, abort, Api, Resource
 
@@ -290,6 +290,7 @@ def reqister():
 def main():
     db_session.global_init("db/blogs.db")
     app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
     # для списка объектов
     api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
 
@@ -300,7 +301,7 @@ def main():
     api.add_resource(users_resources.UserListResource, '/api/v2/users')
 
     # для одного объекта
-    api.add_resource(users_resources.UserListResource, '/api/v2/users/<int:users_id>')
+    api.add_resource(users_resources.UserResource, '/api/v2/users/<int:users_id>')
 
     app.run(port=8080, host='127.0.0.1')
 

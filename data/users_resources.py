@@ -9,7 +9,7 @@ parser.add_argument('age', required=True, type=int)
 parser.add_argument('position', required=True)
 parser.add_argument('speciality', required=True)
 parser.add_argument('address', required=True)
-parser.add_argument('email', required=True, type=email)
+parser.add_argument('email', required=True)
 parser.add_argument('hashed_password', required=True)
 parser.add_argument('dep_id', required=True, type=int)
 
