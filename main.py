@@ -1,20 +1,34 @@
-from flask import Flask, render_template, redirect, request
-from data.users import User
+from flask import Flask, render_template, redirect, request, make_response, jsonify
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from requests import post
+
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm
 from forms.category import CategoryForm
 from forms.department import DepartmentForm
+
+from data.users import User
 from data.jobs import Jobs
 from data.category import Category
 from data.department import Department
 from data import db_session
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from data import db_session, jobs_api, users_api
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+@app.errorhandler(404)
+def not_found(_):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
 @login_manager.user_loader
@@ -343,7 +357,17 @@ def reqister():
 
 def main():
     db_session.global_init("db/blogs.db")
+    app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
     app.run(port=8080, host='127.0.0.1')
+    # print(post('http://127.0.0.1:8080/api/jobs',
+    #            json={'team_leader': 2,
+    #                  'job': 'gdsfgd',
+    #                  'work_size': 1,
+    #                  "collaborators": "1, 2, 3",
+    #                  "start_date": "21:21:2024",
+    #                  "end_date": "21:21:2024",
+    #                  'is_finished': 0}).json())
 
 
 if __name__ == '__main__':
