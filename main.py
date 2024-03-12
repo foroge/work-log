@@ -1,6 +1,8 @@
-from flask import Flask, render_template, redirect, request, make_response, jsonify
+import os
+
+from flask import Flask, render_template, redirect, request, make_response, jsonify, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from requests import post
+from requests import get
 
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm

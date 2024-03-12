@@ -20,6 +20,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime)
+    city_from = sqlalchemy.Column(sqlalchemy.String)
 
     dep_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("department.id"))
     department = orm.relationship('Department', back_populates="members")

@@ -24,12 +24,12 @@ def test_edit(tests):
         print(f"{test[2]}: {post(test[0], json=test[1])}")
 
 
-# char = list()
-# for i in range(3):
-#     one = dict(surname=f"Gen{i + 1}", name=f"Alex{i}", age=20, position="chief", speciality="biolog", address="module_1",
-#                email=f"{i}@x", hashed_password=123, dep_id=3)
-#     char.append((f'http://127.0.0.1:8080/api/users/{i}', one, "correct"))
-# test_post(char)
+char = list()
+for i in range(3, 7):
+    one = dict(surname=f"Gen{i + 1}", name=f"Alex{i}", age=20, position="chief", speciality="biolog", address="module_1",
+               email=f"{i}@x", hashed_password=123, dep_id=3, city_from="Москва")
+    char.append((f'http://127.0.0.1:8080/api/users', one, "correct"))
+test_post(char)
 # char = list()
 # for i in range(3):
 #     one = dict(surname=f"Gen{i + 3}")
