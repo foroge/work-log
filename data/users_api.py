@@ -112,4 +112,7 @@ def users_show(id):
     with open(map_file, "wb") as file:
         file.write(response_next.content)
     path = url_for("static", filename=f"img/city_{id}.png")
-    return render_template('city_image.html', title='Изображение города', path=path)
+    name = user.name
+    surname = user.surname
+    return render_template('city_image.html', title='Изображение города', path=path, name=name,
+                           surname=surname, city=city)
