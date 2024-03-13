@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from requests import post
+from flask_restful import reqparse, abort, Api, Resource
 
 from forms.user import RegisterForm, LoginForm
 from forms.job import JobsForm
@@ -11,10 +12,11 @@ from data.users import User
 from data.jobs import Jobs
 from data.category import Category
 from data.department import Department
-from data import db_session, jobs_api, users_api
+from data import db_session, jobs_api, users_resources, users_api
 
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -358,15 +360,11 @@ def main():
     db_session.global_init("db/blogs.db")
     app.register_blueprint(jobs_api.blueprint)
     app.register_blueprint(users_api.blueprint)
+    # api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
+    # api.add_resource(jobs_resources.JobsResource, '/api/v2/jobs/<int:jobs_id>')
+    api.add_resource(users_resources.UserListResource, '/api/v2/users')
+    api.add_resource(users_resources.UserResource, '/api/v2/users/<int:users_id>')
     app.run(port=8080, host='127.0.0.1')
-    # print(post('http://127.0.0.1:8080/api/jobs',
-    #            json={'team_leader': 2,
-    #                  'job': 'gdsfgd',
-    #                  'work_size': 1,
-    #                  "collaborators": "1, 2, 3",
-    #                  "start_date": "21:21:2024",
-    #                  "end_date": "21:21:2024",
-    #                  'is_finished': 0}).json())
 
 
 if __name__ == '__main__':
