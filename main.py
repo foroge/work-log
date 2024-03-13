@@ -12,7 +12,7 @@ from data.users import User
 from data.jobs import Jobs
 from data.category import Category
 from data.department import Department
-from data import db_session, jobs_api, users_resources, users_api
+from data import db_session, jobs_api, users_resources, users_api, jobs_resources
 
 
 app = Flask(__name__)
@@ -360,8 +360,8 @@ def main():
     db_session.global_init("db/blogs.db")
     app.register_blueprint(jobs_api.blueprint)
     app.register_blueprint(users_api.blueprint)
-    # api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
-    # api.add_resource(jobs_resources.JobsResource, '/api/v2/jobs/<int:jobs_id>')
+    api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
+    api.add_resource(jobs_resources.JobsResource, '/api/v2/jobs/<int:jobs_id>')
     api.add_resource(users_resources.UserListResource, '/api/v2/users')
     api.add_resource(users_resources.UserResource, '/api/v2/users/<int:users_id>')
     app.run(port=8080, host='127.0.0.1')
